@@ -1,10 +1,12 @@
 from fastapi import APIRouter
+from ..models.analysis import MarketAnalysisRequest
 
 router = APIRouter()
 
-@router.post("/analysis")
-def analysis(data: dict):
+@router.post("/analyze")
+def analyze(request: MarketAnalysisRequest):
     return {
-        "message": "Analysis endpoint is working",
-        "data": data
+        "message": "analyze endpoint is working",
+        "symbol": request.symbol,
+        "ltp": request.ltp
     }
