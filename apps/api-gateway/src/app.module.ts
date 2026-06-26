@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
+import { AiModule } from './ai/ai.module';
 import { BrokerModule } from './broker/broker.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
@@ -18,6 +19,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     HealthModule,
     MarketModule,
     BrokerModule,
+    AiModule,
   ],
   providers: [MarketGateway],
 })
