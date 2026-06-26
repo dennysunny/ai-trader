@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { MarketService } from './services/market.service';
 import { MarketController } from './controllers/market.controller';
+import { MarketGateway } from '../websocket/market/market.gateway';
 
 /*
  * GOAL:
@@ -11,7 +12,7 @@ import { MarketController } from './controllers/market.controller';
 @Module({
   imports: [],
   controllers: [MarketController],
-  providers: [MarketService],
+  providers: [MarketService, MarketGateway],
   exports: [],
 })
 export class MarketModule {}

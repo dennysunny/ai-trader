@@ -35,3 +35,19 @@ IV
 Sentiment scoring
 Trade recommendations
 Explanations
+
+26/06/2026
+Arch:
+Angular
+
+                       │
+         REST + Socket.IO
+                       │
+                NestJS Gateway
+                       │
+     ┌─────────────────┼─────────────────┐
+     │                 │                 │
+
+PostgreSQL Redis FastAPI AI
+│ │
+└────────────── Alice Blue ──────────┘
