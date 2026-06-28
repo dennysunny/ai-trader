@@ -24,6 +24,7 @@ export class MarketService {
     setInterval(() => {
       this.marketGateway.broadcastMarketUpdate({
         symbol: 'NIFTY',
+        instrumentType: 'NFO',
         ltp: 25000 + Math.random() * 100,
         exchange: 'NSE',
         token: '12345',

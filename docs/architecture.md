@@ -1,44 +1,26 @@
-25/06/2026
-PHASE 1:
-+----------------+
-| Angular UI |
-+-------+--------+
-|
-REST / WebSocket
-|
-+-------v--------+
-| NestJS |
-+-------+--------+
-|
-+-----------------+----------------+
-| |
-PostgreSQL FastAPI AI
-| |
-+-----------------+----------------+
-|
-Redis
+# System Architecture
 
-26/06/2026
-Phase 2 - Market Data Pipeline
+```mermaid
+flowchart LR
+A[Angular] --> B[NestJS]
+B --> C[Broker Engine]
+C --> D[Alice Blue]
+C --> E[Event Bus]
+E --> F[Redis]
+E --> G[AI Engine]
+E --> H[PostgreSQL]
+G --> B
+B --> A
+```
 
-Alice Blue
-│
-▼
-Broker Adapter
-│
-▼
-Market Data Pipeline
-│
-┌────┴───────────┐
-│ │
-▼ ▼
-Redis PostgreSQL
-│ │
-▼ ▼
-AI Engine Historical Data
-│
-▼
-Recommendation
-│
-▼
-Angular
+# Sequence Diagram
+
+```mermaid
+sequenceDiagram
+AliceBlue->>Broker: Tick
+Broker->>EventBus: MarketTickReceived
+EventBus->>AI: Analyze
+AI-->>EventBus: Recommendation
+EventBus->>Gateway: Broadcast
+Gateway-->>Angular: Market Update
+```

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { AiModule } from './ai/ai.module';
 import { BrokerModule } from './broker/broker.module';
@@ -14,6 +15,7 @@ import { WebsocketModule } from './websocket/websocket.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    EventEmitterModule.forRoot(),
     WebsocketModule,
     DatabaseModule,
     HealthModule,
