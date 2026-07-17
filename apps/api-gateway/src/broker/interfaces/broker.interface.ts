@@ -9,3 +9,10 @@ export interface IBroker {
 
   onTick(callback: (tick: MarketTick) => void): void;
 }
+
+export interface IAliceBlueUserDetailsResponse {
+  stat: string;
+  clientId?: string;
+  userSession?: string;
+  emsg?: string;
+}
