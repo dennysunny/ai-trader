@@ -3,6 +3,10 @@ import { Injectable } from '@nestjs/common';
 import { IMarketTick } from '../../../market/interfaces/market-tick.interface';
 import { IAliceBlueMarketMessage } from '../../interfaces/alice-blue/alice-blue-broker.interface';
 
+/**
+ * AliceBlueMarketMapper is a service that maps Alice Blue market messages to the IMarketTick interface.
+ * It provides a method to map the message and an optional previous tick to fill in missing fields.
+ */
 @Injectable()
 export class AliceBlueMarketMapper {
   /**
@@ -21,12 +25,12 @@ export class AliceBlueMarketMapper {
       token: message.tk ?? previous?.token ?? '',
       exchange: message.e ?? previous?.exchange ?? '',
       symbol: message.ts ?? previous?.symbol ?? '',
-      ltp: this.number(message.lp, previous?.ltp),
-      open: this.number(message.o, previous?.open),
-      high: this.number(message.h, previous?.high),
-      low: this.number(message.l, previous?.low),
-      close: this.number(message.c, previous?.close),
-      volume: this.number(message.v, previous?.volume),
+      ltp: this.convertToNumber(message.lp, previous?.ltp),
+      open: this.convertToNumber(message.o, previous?.open),
+      high: this.convertToNumber(message.h, previous?.high),
+      low: this.convertToNumber(message.l, previous?.low),
+      close: this.convertToNumber(message.c, previous?.close),
+      volume: this.convertToNumber(message.v, previous?.volume),
       timestamp,
     };
   }
@@ -37,7 +41,7 @@ export class AliceBlueMarketMapper {
    * @param { number | null | undefined } fallback - An optional fallback value to return if the conversion fails or if the value is undefined
    * @returns { number | null } - The converted number or the fallback value, or null if both are undefined
    */
-  private number(
+  private convertToNumber(
     value: string | undefined,
     fallback: number | null | undefined,
   ): number | null {

@@ -12,6 +12,12 @@ import { createHash } from 'crypto';
 export class ChecksumService {
   constructor(private readonly configService: ConfigService) {}
 
+  /**
+   * Method to generate a checksum for Alice Blue authentication.
+   * @param {string} userId - The user ID provided by Alice Blue during the authentication process
+   * @param {string} authCode - The authentication code provided by Alice Blue during the authentication process
+   * @returns {string} - The generated checksum as a SHA-256 hash string
+   */
   generate(userId: string, authCode: string): string {
     const apiSecret = this.configService.getOrThrow<string>(
       'ALICE_BLUE_API_SECRET',

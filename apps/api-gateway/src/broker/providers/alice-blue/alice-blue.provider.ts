@@ -6,7 +6,7 @@ import { IBroker } from '../../interfaces/broker.interface';
 import { ConnectionManager } from '../../managers/connection.manager';
 import { SessionManager } from '../../managers/session.manager';
 import { SubscriptionManager } from '../../managers/subscription.manager';
-import { AliceBlueMapper } from '../../mappers/alice-blue/alice-blue.mapper';
+import { AliceBlueMarketMapper } from '../../mappers/alice-blue/alice-blue-market.mapper';
 
 @Injectable()
 export class AliceBlueProvider implements IBroker {
@@ -14,7 +14,7 @@ export class AliceBlueProvider implements IBroker {
     private readonly sessionManager: SessionManager,
     private readonly connectionManager: ConnectionManager,
     private readonly subscriptionManager: SubscriptionManager,
-    private readonly mapper: AliceBlueMapper,
+    private readonly mapper: AliceBlueMarketMapper,
     private readonly eventEmitter: EventEmitter2,
   ) {}
 

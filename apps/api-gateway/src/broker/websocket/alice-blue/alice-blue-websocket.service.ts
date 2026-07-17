@@ -11,7 +11,7 @@ import { IMarketTick } from '../../../market/interfaces/market-tick.interface';
 import { AliceBlueAuthService } from '../../auth/alice-blue/alice-blue-auth.service';
 import { WebsocketTokenService } from './websocket-token.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AliceBlueMarketMapper } from '../../providers/alice-blue/alice-blue-market.mapper';
+import { AliceBlueMarketMapper } from '../../mappers/alice-blue/alice-blue-market.mapper';
 import { MarketTickReceivedEvent } from '../../../market/events/market-tick-received.event';
 import { IAliceBlueMarketMessage } from '../../interfaces/alice-blue/alice-blue-broker.interface';
 
