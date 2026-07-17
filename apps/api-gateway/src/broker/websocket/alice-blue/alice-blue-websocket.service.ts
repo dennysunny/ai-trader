@@ -3,12 +3,17 @@ import { ConfigService } from '@nestjs/config';
 
 import WebSocket from 'ws';
 
-import { WebsocketTokenService } from './websocket-token.service';
 import {
   WebsocketMessageType,
   WebsocketState,
 } from '../../../config/broker/alice-blue/alice-blue-broker.enum';
+import { IMarketTick } from '../../../market/interfaces/market-tick.interface';
 import { AliceBlueAuthService } from '../../auth/alice-blue/alice-blue-auth.service';
+import { WebsocketTokenService } from './websocket-token.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AliceBlueMarketMapper } from '../../providers/alice-blue/alice-blue-market.mapper';
+import { MarketTickReceivedEvent } from '../../../market/events/market-tick-received.event';
+import { IAliceBlueMarketMessage } from '../../interfaces/alice-blue/alice-blue-broker.interface';
 
 /**
  * Service to manage WebSocket connections with Alice Blue.
@@ -18,15 +23,30 @@ import { AliceBlueAuthService } from '../../auth/alice-blue/alice-blue-auth.serv
  */
 @Injectable()
 export class AliceBlueWebsocketService {
+  /** Logger instance for the service. */
   private readonly logger = new Logger(AliceBlueWebsocketService.name);
+
+  /** WebSocket instance for the service. */
   private socket: WebSocket | null = null;
+
+  /** Current state of the WebSocket connection. */
   private state: WebsocketState = WebsocketState.DISCONNECTED;
+
+  /** Timer for managing heartbeat messages. */
   private heartbeatTimer: NodeJS.Timeout | null = null;
+
+  /** Map to store the latest market tick data for each instrument. */
+  private readonly marketState = new Map<string, IMarketTick>();
+
+  /** Map to store the exchange for each token. */
+  private readonly tokenExchangeMap = new Map<string, string>();
 
   constructor(
     private readonly configService: ConfigService,
     private readonly authService: AliceBlueAuthService,
     private readonly tokenService: WebsocketTokenService,
+    private readonly mapper: AliceBlueMarketMapper,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   /**
@@ -168,10 +188,12 @@ export class AliceBlueWebsocketService {
 
         case WebsocketMessageType.MARKET_SUBSCRIPTION_ACK:
           this.logger.debug('Market subscription acknowledgement received');
+          this.handleMarketMessage(message);
           break;
 
         case WebsocketMessageType.MARKET_TICK:
           this.logger.debug(`Market tick received for token ${message.tk}`);
+          this.handleMarketMessage(message);
           break;
 
         case WebsocketMessageType.DEPTH_SUBSCRIPTION_ACK:
@@ -215,6 +237,47 @@ export class AliceBlueWebsocketService {
   }
 
   /**
+   * Method to handle market messages from Alice Blue.
+   * It processes market subscription acknowledgements and market tick messages.
+   * For market subscription acknowledgements, it updates the token-exchange mapping.
+   * For market tick messages, it maps the message to an IMarketTick object and emits a MarketTickReceivedEvent.
+   * If a market tick message does not contain a token, it ignores the message.
+   * @param message - The market message received from the WebSocket connection.
+   */
+  private handleMarketMessage(message: IAliceBlueMarketMessage): void {
+    if (!message.tk && message.t === WebsocketMessageType.MARKET_TICK) {
+      return;
+    }
+
+    if (
+      message.t === WebsocketMessageType.MARKET_SUBSCRIPTION_ACK &&
+      message.tk &&
+      message.e
+    ) {
+      this.tokenExchangeMap.set(message.tk, message.e);
+    }
+
+    const exchange =
+      message.e ?? this.tokenExchangeMap.get(message.tk ?? '') ?? '';
+    const token = message.tk ?? '';
+    const key = `${exchange}:${token}`;
+    const previous = this.marketState.get(key);
+    const tick = this.mapper.map(message, previous);
+
+    /*
+     * A tf message may not contain exchange or symbol.
+     * If necessary, find the previous token state.
+     */
+
+    this.marketState.set(key, tick);
+
+    this.eventEmitter.emit(
+      'market.tick.received',
+      new MarketTickReceivedEvent(tick),
+    );
+  }
+
+  /**
    * Method to start the heartbeat mechanism for the WebSocket connection.
    * It sets up a timer that sends a heartbeat message to the WebSocket server every 50 seconds.
    * If the WebSocket is not open, it does not send the heartbeat.
@@ -249,5 +312,71 @@ export class AliceBlueWebsocketService {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
+  }
+
+  /**
+   * Method to subscribe to market data for a list of instruments.
+   * It checks if the WebSocket is connected and open before sending the subscription request.
+   * The instruments are formatted into a string of keys, which is sent to the WebSocket server as a subscription request.
+   * If the WebSocket is not connected or open, it throws an error.
+   * @param instruments - An array of instruments to subscribe to, each containing an exchange and a token.
+   */
+  subscribeMarketData(
+    instruments: {
+      exchange: string;
+      token: string;
+    }[],
+  ): void {
+    if (this.state !== WebsocketState.CONNECTED) {
+      throw new Error('WebSocket must be connected before subscribing');
+    }
+
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      throw new Error('WebSocket connection is not open');
+    }
+
+    const keys = instruments
+      .map((instrument) => `${instrument.exchange}|${instrument.token}`)
+      .join('#');
+
+    const request = {
+      k: keys,
+      t: 't',
+    };
+
+    this.socket.send(JSON.stringify(request));
+
+    this.logger.log(`Market subscription sent: ${keys}`);
+  }
+
+  /**
+   * Method to unsubscribe from market data for a list of instruments.
+   * It checks if the WebSocket is connected and open before sending the unsubscription request.
+   * The instruments are formatted into a string of keys, which is sent to the WebSocket server as an unsubscription request.
+   * If the WebSocket is not connected or open, it does not perform any action.
+   * @param instruments - An array of instruments to unsubscribe from, each containing an exchange and a token.
+   */
+  unsubscribeMarketData(
+    instruments: {
+      exchange: string;
+      token: string;
+    }[],
+  ): void {
+    if (!this.socket) {
+      return;
+    }
+
+    const keys = instruments
+      .map((instrument) => `${instrument.exchange}|${instrument.token}`)
+      .join('#');
+
+    this.socket.send(
+      JSON.stringify({
+        k: keys,
+        t: 'u',
+      }),
+    );
+
+    this.logger.log(`Market unsubscribe sent: ${keys}`);
   }
 }

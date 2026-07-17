@@ -1,4 +1,4 @@
-import { MarketTick } from '../../market/interfaces/market-tick.interface';
+import { IMarketTick } from '../../market/interfaces/market-tick.interface';
 
 export interface IBroker {
   connect(): Promise<void>;
@@ -7,12 +7,5 @@ export interface IBroker {
   subscribe(tokens: string[]): Promise<void>;
   unsubscribe(tokens: string[]): Promise<void>;
 
-  onTick(callback: (tick: MarketTick) => void): void;
-}
-
-export interface IAliceBlueUserDetailsResponse {
-  stat: string;
-  clientId?: string;
-  userSession?: string;
-  emsg?: string;
+  onTick(callback: (tick: IMarketTick) => void): void;
 }

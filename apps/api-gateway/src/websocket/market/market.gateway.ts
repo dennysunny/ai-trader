@@ -7,7 +7,7 @@ import {
 
 import { Server, Socket } from 'socket.io';
 
-import { MarketTick } from '../../market/interfaces/market-tick.interface';
+import { IMarketTick } from '../../market/interfaces/market-tick.interface';
 
 @WebSocketGateway({
   cors: {
@@ -25,7 +25,7 @@ export class MarketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  broadcastMarketUpdate(data: MarketTick) {
+  broadcastMarketUpdate(data: IMarketTick) {
     this.server.emit('marketData', data);
   }
 }

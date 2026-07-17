@@ -30,4 +30,25 @@ export class AliceBlueWebSocketController {
       state: this.websocketService.getState(),
     };
   }
+
+  // Temporary endpoint for subscribing to NIFTY and BANKNIFTY indices
+  @Post('subscribe/indices')
+  subscribeIndices() {
+    this.websocketService.subscribeMarketData([
+      {
+        exchange: 'NSE',
+        token: '26000',
+      },
+      {
+        exchange: 'NSE',
+        token: '26009',
+      },
+    ]);
+
+    return {
+      subscribed: true,
+
+      instruments: ['NIFTY', 'BANKNIFTY'],
+    };
+  }
 }

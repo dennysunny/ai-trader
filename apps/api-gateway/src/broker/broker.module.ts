@@ -7,6 +7,7 @@ import { ChecksumService } from './auth/alice-blue/checksum.service';
 import { AliceBlueWebsocketService } from './websocket/alice-blue/alice-blue-websocket.service';
 import { WebsocketTokenService } from './websocket/alice-blue/websocket-token.service';
 import { AliceBlueWebSocketController } from './websocket/alice-blue/alice-blue-websocket.controller';
+import { AliceBlueMarketMapper } from './providers/alice-blue/alice-blue-market.mapper';
 
 @Module({
   imports: [HttpModule],
@@ -16,6 +17,7 @@ import { AliceBlueWebSocketController } from './websocket/alice-blue/alice-blue-
     ChecksumService,
     AliceBlueWebsocketService,
     WebsocketTokenService,
+    AliceBlueMarketMapper,
   ],
   exports: [AliceBlueAuthService, AliceBlueWebsocketService],
 })

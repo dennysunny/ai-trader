@@ -1,15 +1,17 @@
+import { HttpService } from '@nestjs/axios';
 import {
   BadGatewayException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { firstValueFrom } from 'rxjs';
 
-import { IBrokerSession } from '../../interfaces/broker-session.interface';
+import {
+  IAliceBlueUserDetailsResponse,
+  IBrokerSession,
+} from '../../interfaces/alice-blue/alice-blue-broker.interface';
 import { ChecksumService } from './checksum.service';
-import { IAliceBlueUserDetailsResponse } from '../../interfaces/broker.interface';
 
 @Injectable()
 export class AliceBlueAuthService {

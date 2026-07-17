@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { MarketTick } from '../../../market/interfaces/market-tick.interface';
+import { IMarketTick } from '../../../market/interfaces/market-tick.interface';
 import { IBroker } from '../../interfaces/broker.interface';
 import { ConnectionManager } from '../../managers/connection.manager';
 import { SessionManager } from '../../managers/session.manager';
@@ -34,7 +34,7 @@ export class AliceBlueProvider implements IBroker {
     // Implementation for unsubscribing from tokens
   }
 
-  onTick(callback: (tick: MarketTick) => void): void {
+  onTick(callback: (tick: IMarketTick) => void): void {
     // Implementation for handling tick events
   }
 }
