@@ -26,4 +26,4 @@
 
 class AnalysisEngine:
     def analyze(self, request):
-        pass
+        return {}

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 
-import { MarketTick } from '../interfaces/market-tick.interface';
+import { IMarketTick } from '../interfaces/market-tick.interface';
 
 @Injectable()
 export class TickProcessorService {
-  processTick(tick: MarketTick) {
+  processTick(tick: IMarketTick) {
     //validate and process the tick data
   }
 }

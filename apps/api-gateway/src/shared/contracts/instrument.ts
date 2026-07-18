@@ -1,4 +1,4 @@
-import { InstrumentType, OptionType } from '../shared-enums.enum';
+import { InstrumentType, OptionType } from '../common.enum';
 
 export interface Instrument {
   exchange: string;

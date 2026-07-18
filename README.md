@@ -1,28 +1,21 @@
-| Service    | Responsibility                                    |
-| ---------- | ------------------------------------------------- |
-| Angular    | UI                                                |
-| NestJS     | API Gateway + Authentication + Broker Integration |
-| FastAPI    | AI, Indicators, Analysis                          |
-| PostgreSQL | Persistent Storage                                |
-| Redis      | Live Cache                                        |
-| Alice Blue | Market Data                                       |
+# AI Trader
 
-25/06/2026
-PHASE 1:
-+----------------+
-| Angular UI |
-+-------+--------+
-|
-REST / WebSocket
-|
-+-------v--------+
-| NestJS |
-+-------+--------+
-|
-+-----------------+----------------+
-| |
-PostgreSQL FastAPI AI
-| |
-+-----------------+----------------+
-|
-Redis
+## Stack
+
+- Angular
+- NestJS
+- FastAPI
+- PostgreSQL
+- Redis
+
+## Architecture
+
+Frontend -> API Gateway -> Broker Engine -> Event Bus -> AI Engine
+
+## Modules
+
+- Broker Engine
+- Market Engine
+- Analysis Engine
+- Recommendation Engine
+- Paper Trading
