@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
 
 import { MarketGateway } from '../websocket/market/market.gateway';
+import { CandleBuilderService } from './services/candles/candle-builder.service';
+import { MarketTestController } from './controllers/market-test.controller';
 import { MarketController } from './controllers/market.controller';
+import { MarketCandleLoggerListener } from './listeners/market-candle-logger.listener';
 import { MarketTickLoggerListener } from './listeners/market-tick-logger.listener';
 import { TickProcessorService } from './pipeline/tick-processor.service';
 import { MarketService } from './services/market.service';
@@ -13,12 +16,17 @@ import { MarketService } from './services/market.service';
  */
 @Module({
   imports: [],
-  controllers: [MarketController],
+  controllers: [MarketController, MarketTestController],
   providers: [
-    MarketService,
+    /* Gateways */
     MarketGateway,
+    /* Services */
+    MarketService,
     TickProcessorService,
+    CandleBuilderService,
+    /* Listeners */
     MarketTickLoggerListener,
+    MarketCandleLoggerListener,
   ],
   exports: [],
 })
