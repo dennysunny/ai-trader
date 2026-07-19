@@ -1,18 +1,103 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
+import { MarketCandleClosedEvent } from '../events/market-candle-closed.event';
 import { MarketTickReceivedEvent } from '../events/market-tick-received.event';
+import { ICandle } from '../interfaces/candle.interface';
 import { IMarketTick } from '../interfaces/market-tick.interface';
+import { CandleBufferService } from '../services/candles/candle-buffer.service';
+import { Timeframe } from '../../shared/common.enum';
 
 /**
  * MarketTestController is a test controller for simulating market tick events.
  * It provides an endpoint to publish a series of market ticks to test the candle building and event handling functionality.
  * The testCandle method emits a predefined set of market ticks, which can be used to verify the correct behavior of the system.
  * Endpoint: POST /market/test/candle
+ * Endpoint: GET /market/test/candles
+ * Endpoint: POST /market/test/generate-history
+ * Endpoint: GET /market/test/candle-status
  */
 @Controller('market/test')
 export class MarketTestController {
-  constructor(private readonly eventEmitter: EventEmitter2) {}
+  constructor(
+    private readonly eventEmitter: EventEmitter2,
+    private readonly candleBuffer: CandleBufferService,
+  ) {}
+
+  @Get('candles')
+  getCandles() {
+    return this.candleBuffer.getLatest(
+      'NSE',
+      '26000',
+      Timeframe.ONE_MINUTE,
+      50,
+    );
+  }
+
+  @Post('generate-history')
+  generateHistory() {
+    const startTime = new Date('2026-07-18T09:15:00+05:30');
+
+    for (let i = 0; i < 50; i++) {
+      const basePrice = 25000 + i * 5;
+
+      const candle: ICandle = {
+        symbol: 'NIFTY',
+        exchange: 'NSE',
+        token: '26000',
+        timeframe: Timeframe.ONE_MINUTE,
+        startTime: new Date(startTime.getTime() + i * 60_000),
+        endTime: new Date(startTime.getTime() + (i + 1) * 60_000),
+        open: basePrice,
+        high: basePrice + 10,
+        low: basePrice - 5,
+        close: basePrice + 5,
+        volume: 1000 + i * 10,
+      };
+
+      this.eventEmitter.emit(
+        'market.candle.closed',
+        new MarketCandleClosedEvent(candle),
+      );
+    }
+
+    return {
+      generated: this.candleBuffer.getAll('NSE', '26000', Timeframe.ONE_MINUTE),
+    };
+  }
+
+  @Get('candle-status')
+  getCandleStatus() {
+    const count = this.candleBuffer.getCount(
+      'NSE',
+      '26000',
+      Timeframe.ONE_MINUTE,
+    );
+
+    return {
+      instrument: 'NIFTY',
+      timeframe: Timeframe.ONE_MINUTE,
+      candleCount: count,
+      readyForRSI14: this.candleBuffer.hasEnoughData(
+        'NSE',
+        '26000',
+        Timeframe.ONE_MINUTE,
+        15,
+      ),
+      readyForEMA20: this.candleBuffer.hasEnoughData(
+        'NSE',
+        '26000',
+        Timeframe.ONE_MINUTE,
+        20,
+      ),
+      readyForEMA50: this.candleBuffer.hasEnoughData(
+        'NSE',
+        '26000',
+        Timeframe.ONE_MINUTE,
+        50,
+      ),
+    };
+  }
 
   @Post('candle')
   testCandle() {

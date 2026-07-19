@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
 
 import { MarketGateway } from '../websocket/market/market.gateway';
-import { CandleBuilderService } from './services/candles/candle-builder.service';
 import { MarketTestController } from './controllers/market-test.controller';
 import { MarketController } from './controllers/market.controller';
 import { MarketCandleLoggerListener } from './listeners/market-candle-logger.listener';
 import { MarketTickLoggerListener } from './listeners/market-tick-logger.listener';
 import { TickProcessorService } from './pipeline/tick-processor.service';
+import { CandleBufferService } from './services/candles/candle-buffer.service';
+import { CandleBuilderService } from './services/candles/candle-builder.service';
 import { MarketService } from './services/market.service';
 
 /*
@@ -24,6 +25,7 @@ import { MarketService } from './services/market.service';
     MarketService,
     TickProcessorService,
     CandleBuilderService,
+    CandleBufferService,
     /* Listeners */
     MarketTickLoggerListener,
     MarketCandleLoggerListener,
